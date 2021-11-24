@@ -40,12 +40,8 @@ fig.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0})
 #fig.update_xaxes(rangeslider_thickness=0.2)
 
-    return fig
-
 ## Build web app with dash
 app = dash.Dash(__name__)
-
-figure = display_vacc_data()
 
 app.layout = lambda: html.Div([
     # H1-Header
@@ -53,13 +49,13 @@ app.layout = lambda: html.Div([
             style={'textAlign': 'center', 'fontFamily': 'Helvetica, Arial, sans-serif'}),
     html.Div([
         html.Div([
-            dcc.Graph(figure=figure)
+            dcc.Graph(figure=fig)
         ], style={'width': '33%', 'float': 'left'}),
         html.Div([
-            dcc.Graph(figure=figure)
+            dcc.Graph(figure=fig)
         ], style={'width': '33%', 'float': 'left'}),
         html.Div([
-            dcc.Graph(figure=figure)
+            dcc.Graph(figure=fig)
         ], style={'width': '33%', 'float': 'left'})
     ])
 ])
