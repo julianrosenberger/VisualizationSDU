@@ -26,14 +26,16 @@ def display_vacc_data():
                         locations='Bundesland',
                         featureidkey='properties.name',
                         hover_name='Bundesland',
+                        height=300,
                         hover_data=['Datum', 'Impfquote_gesamt_voll'],
                         color='Impfquote_gesamt_voll',
                         color_continuous_scale=px.colors.diverging.RdYlGn,
                         labels={'Impfquote_gesamt_voll': 'fully vaccinated'}
                         )
-    fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_geos(fitbounds="locations", visible=False, showframe=False)
     fig.update_layout(
             margin={"r": 0, "t": 0, "l": 0, "b": 0})
+    fig.update_xaxes(rangeslider_thickness=0.2)
 
     return fig
 
@@ -53,10 +55,14 @@ app.layout = lambda: html.Div([
             style={'textAlign': 'center', 'fontFamily': 'Helvetica, Arial, sans-serif'}),
     html.Div([
         html.Div([
-            dcc.Graph(
-                figure=figure,
-                id='vaccination-map')
-        ], style={'width': '46%', 'display': 'inline-block', 'verticalAlign': 'top', 'margin': '2%'}),
+            dcc.Graph(figure=figure)
+        ], style={'width': '33%', 'float': 'left'}),
+        html.Div([
+            dcc.Graph(figure=figure)
+        ], style={'width': '33%', 'float': 'left'}),
+        html.Div([
+            dcc.Graph(figure=figure)
+        ], style={'width': '33%', 'float': 'left'})
     ])
 ])
 
