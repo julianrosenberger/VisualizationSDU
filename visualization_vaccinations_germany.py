@@ -20,12 +20,13 @@ minvacc = float(vacc_data["Impfquote_gesamt_voll"].min())
 maxvacc = float(vacc_data["Impfquote_gesamt_voll"].max())
 
 # Open Germany map as GeoJSON
-with urlopen(
-        "https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/2_hoch.geo.json") as file:
+with urlopen("https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/2_hoch.geo.json") as file:
     germany_states = json.load(file)
 
 
-fig = px.choropleth(data_frame=vacc_data,
+fig = px.choropleth_mapbox(
+                    mapbox_style='white-bg',
+                    data_frame=vacc_data,
                     geojson=germany_states,
                     locations='Bundesland',
                     featureidkey='properties.name',
@@ -35,7 +36,13 @@ fig = px.choropleth(data_frame=vacc_data,
                     color_continuous_scale=px.colors.diverging.RdYlGn,
                     labels={'Impfquote_gesamt_voll': 'fully vaccinated'}
                     )
-fig.update_geos(fitbounds="locations", visible=False, showframe=False)
+fig.update_mapboxes(
+    center_lat=51.5,
+    center_lon=10.25,
+    zoom=4.6
+    # ToDo: add maxzoom here
+    #layers=list({'maxzoom': '4.6'})
+)
 fig.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0})
 #fig.update_xaxes(rangeslider_thickness=0.2)
