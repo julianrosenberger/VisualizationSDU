@@ -19,30 +19,28 @@ vacc_data = pd.read_csv(url_vacc_data, skiprows=[1, 18])
 minvacc = float(vacc_data["Impfquote_gesamt_voll"].min())
 maxvacc = float(vacc_data["Impfquote_gesamt_voll"].max())
 
-# figure for vaccination data
-def display_vacc_data():
-    fig = px.choropleth(data_frame=vacc_data,
-                        geojson=germany_states,
-                        locations='Bundesland',
-                        featureidkey='properties.name',
-                        hover_name='Bundesland',
-                        height=300,
-                        hover_data=['Datum', 'Impfquote_gesamt_voll'],
-                        color='Impfquote_gesamt_voll',
-                        color_continuous_scale=px.colors.diverging.RdYlGn,
-                        labels={'Impfquote_gesamt_voll': 'fully vaccinated'}
-                        )
-    fig.update_geos(fitbounds="locations", visible=False, showframe=False)
-    fig.update_layout(
-            margin={"r": 0, "t": 0, "l": 0, "b": 0})
-    fig.update_xaxes(rangeslider_thickness=0.2)
-
-    return fig
-
 # Open Germany map as GeoJSON
 with urlopen(
         "https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/2_hoch.geo.json") as file:
     germany_states = json.load(file)
+
+
+fig = px.choropleth(data_frame=vacc_data,
+                    geojson=germany_states,
+                    locations='Bundesland',
+                    featureidkey='properties.name',
+                    hover_name='Bundesland',
+                    hover_data=['Datum', 'Impfquote_gesamt_voll'],
+                    color='Impfquote_gesamt_voll',
+                    color_continuous_scale=px.colors.diverging.RdYlGn,
+                    labels={'Impfquote_gesamt_voll': 'fully vaccinated'}
+                    )
+fig.update_geos(fitbounds="locations", visible=False, showframe=False)
+fig.update_layout(
+        margin={"r": 0, "t": 0, "l": 0, "b": 0})
+#fig.update_xaxes(rangeslider_thickness=0.2)
+
+    return fig
 
 ## Build web app with dash
 app = dash.Dash(__name__)
