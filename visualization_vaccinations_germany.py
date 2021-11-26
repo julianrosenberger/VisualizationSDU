@@ -19,6 +19,8 @@ vacc_data = pd.read_csv(url_vacc_data, skiprows=[1, 18])
 minvacc = float(vacc_data["Impfquote_gesamt_voll"].min())
 maxvacc = float(vacc_data["Impfquote_gesamt_voll"].max())
 
+## Read-in RKI Covid-Data
+
 # Open Germany map as GeoJSON
 with urlopen("https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/2_hoch.geo.json") as file:
     germany_states = json.load(file)
@@ -33,7 +35,7 @@ fig = px.choropleth_mapbox(
                     hover_name='Bundesland',
                     hover_data=['Datum', 'Impfquote_gesamt_voll'],
                     color='Impfquote_gesamt_voll',
-                    color_continuous_scale=px.colors.diverging.RdYlGn,
+                    color_continuous_scale=px.colors.sequential.Blues,
                     labels={'Impfquote_gesamt_voll': 'fully vaccinated'}
                     )
 fig.update_mapboxes(
@@ -43,8 +45,16 @@ fig.update_mapboxes(
     # ToDo: add maxzoom here
     #layers=list({'maxzoom': '4.6'})
 )
+#fig.update(
+ #   layout_coloraxis_showscale=False
+#)
+'''fig.update_coloraxes( # https://plotly.com/python/reference/layout/coloraxis/
+    cmin=45,
+    cmax=95
+)'''
 fig.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0})
+
 #fig.update_xaxes(rangeslider_thickness=0.2)
 
 ## Build web app with dash
