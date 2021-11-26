@@ -24,11 +24,6 @@ with urlopen("https://raw.githubusercontent.com/julianrosenberger/VisualizationS
     covid_data = pd.read_csv(cases)
     #print(covid_data.head)
 
-## Read-in Voring Results 2021 Germany
-'''with urlopen("https://raw.githubusercontent.com/julianrosenberger/VisualizationSDU/main/data/kerg2.csv?token=ARUOLO2IH4Y4V6LPU4FAA2DBVJCW6") as votes:
-    voting_data = pd.read_csv(votes, delimiter=';', error_bad_lines=False)
-    print(voting_data.head)'''
-
 # Open Germany map as GeoJSON
 with urlopen("https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/2_hoch.geo.json") as file:
     germany_states = json.load(file)
