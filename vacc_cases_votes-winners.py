@@ -9,11 +9,15 @@ import pandas as pd
 import pandasql
 import dash
 from dash.dependencies import Input, Output
-import dash_core_components as dcc #this had to be changed
-import dash_html_components as html #this as well
+# import dash_core_components as dcc #this had to be changed
+from dash import dcc
+# import dash_html_components as html #this as well
+from dash import html
 import plotly.express as px
 from urllib.request import urlopen
 import json
+
+pd.options.mode.chained_assignment = None  # default='warn'
 
 # get vaccination data from rki vaccination github repo:
 # (https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland)
@@ -33,7 +37,7 @@ covid_data = pd.json_normalize(covid_states, record_path=['features'])
 
 ## Read in Voting-Results
 with urlopen("https://raw.githubusercontent.com/julianrosenberger/VisualizationSDU/main/data/kerg2.csv?token=ARUOLO332LU5QYK5OW3OF6LBW4POK") as f:
-    data = pd.read_csv(f, delimiter=';', skiprows=9, usecols=['Gebietsnummer', 'Gebietsname', 'Gruppenart', 'Gruppenname', 'Gruppenreihenfolge', 'Stimme',	'Prozent'])
+    data = pd.read_csv(f, delimiter=';', skiprows=9, usecols=['Gebietsnummer', 'Gebietsname', 'UegGebietsnummer', 'Gruppenart', 'Gruppenname', 'Gruppenreihenfolge', 'Stimme',	'Prozent'])
 
 
 # #Deleting where Gruppenart!=Partei
@@ -45,8 +49,11 @@ df_clear2 = df_clear[df_clear.Stimme==1]
 # Grouped dataframe with only the states 1-16 (both incl.)
 df_clear3 = df_clear2[df_clear2.Gebietsnummer < 17]
 
+# Make sure Gebietsnummer belongs to state
+df_clear4 = df_clear3[df_clear3.UegGebietsnummer == 99]
 
-df_clear=df_clear3
+
+df_clear = df_clear4
 
 # cleaning 
 print(type('Prozent')) # string --> convert to int
@@ -55,23 +62,36 @@ print(type('Prozent')) # string --> convert to int
 df_clear['Prozent'] = df_clear['Prozent'].fillna(0)
 
 # , --> .
-df_clear['Prozent'] = (df_clear['Prozent'].replace(',','.', regex=True).astype(float))
+df_clear['Prozent'] = (df_clear['Prozent'].replace(',', '.', regex=True).astype(float))
 
 # string --> int
 df_clear['Prozent'] = pd.to_numeric(df_clear['Prozent'])
 
-#print(df_clear.head())
+#print(df_clear.to_string())
 
 
 # Gruping by state:
-#df_group = df_clear.groupby('Gebietsnummer')
-#print(df_group.tail())
+df_group = df_clear.groupby('Gebietsnummer')
+print(df_group)
+#print(df_group['Gebietsnummer'] == 11)
+
+for key, item in df_group:
+    print(df_group.get_group(key))
 
 # Get the indices of the original dataframe to find out which party etc. it belongs to:
-idx = df_clear.groupby(['Gebietsnummer'])['Prozent'].transform(max) == df_clear['Prozent']
+#idx = df_group(['Gebietsnummer'])['Prozent'].transform(max) == df_clear['Prozent']
+#print(idx.head())
 
-winners=df_clear[idx]
-# Lübeck is now state 11 instead of Berlin...
+maximums = df_group['Prozent'].max()
+#print(maximums.to_string())
+
+#print(df_clear.loc[df_clear.groupby(['Gebietsnummer'])['Prozent'].idxmax()].reset_index(drop=True))
+
+winners = df_clear.loc[df_clear.groupby(['Gebietsnummer'])['Prozent'].idxmax()].reset_index(drop=True)
+print(winners.to_string())
+
+
+
 
 
 
@@ -162,20 +182,24 @@ cov.update_mapboxes(
     zoom=4.6
 )
 
+
 ## Plot Voting-results
 vote = px.choropleth_mapbox(
     mapbox_style='white-bg',
-    data_frame=voting_results,
+    data_frame=winners,
     geojson=germany_states,
-    locations='State',
+    locations='Gebietsname',
     featureidkey='properties.name',
-    hover_name='State',
-    hover_data={'State': False,
-                'Party': True,
-                'Result': ':.2f%'},
-    color='Result',
-    color_continuous_scale=px.colors.sequential.YlOrRd,
-    #labels={'attributes.cases7_bl_per_100k': '7-day incidence', 'attributes.LAN_ew_GEN': 'State', 'attributes.death7_bl': '7-day deaths'}
+    hover_name='Gebietsname',
+    hover_data={'Gebietsname': False,
+                'Gruppenname': True,
+                'Prozent': ':.2f%'},
+    color='Gruppenname',
+    color_discrete_map={'SPD': "#E3000F",
+                        "CDU": "#32302e",
+                        "CSU": "#32302e",
+                        "AfD": "#009ee0"},
+    labels={'Gebietsname': 'State', 'Gruppenname': 'Party', 'Prozent': 'Result'}
 )
 vote.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0})
@@ -193,6 +217,17 @@ app.layout = lambda: html.Div([
     # H1-Header
     html.H1(children="Does voting against vaccinations mean voting for COVID?",
             style={'textAlign': 'center', 'fontFamily': 'Helvetica, Arial, sans-serif'}),
+    html.Div([
+        html.Div([
+            dcc.Graph(figure=vacc)
+        ], style={'width': '33%', 'float': 'left'}),
+        html.Div([
+            dcc.Graph(figure=cov)
+        ], style={'width': '33%', 'float': 'left'}),
+        html.Div([
+            dcc.Graph(figure=vote)
+        ], style={'width': '33%', 'float': 'left'})
+    ]),
     html.Div([
         html.Div([
             dcc.Graph(figure=vacc)
