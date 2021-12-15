@@ -19,7 +19,6 @@ import json
 
 pd.options.mode.chained_assignment = None  # default='warn'
 px.set_mapbox_access_token(open("mapbox_token.txt").read())
-print(open("mapbox_token.txt").read())
 
 # get vaccination data from rki vaccination github repo:
 # (https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland)
@@ -37,6 +36,16 @@ with urlopen("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services
 
 covid_data = pd.json_normalize(covid_states, record_path=['features'])
 
+## Read-in historical Case-Data
+with urlopen("https://raw.githubusercontent.com/jgehrcke/covid-19-germany-gae/master/cases-rki-by-state.csv") as cov_history:
+    covid_history = pd.read_csv(cov_history)
+
+covid_history_germany = covid_history[["time_iso8601", "sum_cases"]]
+covid_history_germany.sum_cases = covid_history_germany.sum_cases.astype(int)
+covid_history_june = covid_history_germany[covid_history_germany["time_iso8601"] > "2020-06-06T17:00:00+0000"]
+covid_daily_cases_june = covid_history_june[["time_iso8601", "sum_cases"]]
+covid_daily_cases_june["daily_cases"] = covid_daily_cases_june.sum_cases.diff().fillna(526).astype(int)
+print(covid_daily_cases_june.head())
 
 
 ## Read in Voting-Results
@@ -60,7 +69,7 @@ df_clear4 = df_clear3[df_clear3.UegGebietsnummer == 99]
 df_clear = df_clear4
 
 # cleaning 
-print(type('Prozent')) # string --> convert to int
+#print(type('Prozent')) # string --> convert to int
 
 #(nan --> 0
 df_clear['Prozent'] = df_clear['Prozent'].fillna(0)
@@ -76,11 +85,11 @@ df_clear['Prozent'] = pd.to_numeric(df_clear['Prozent'])
 
 # Gruping by state:
 df_group = df_clear.groupby('Gebietsnummer')
-print(df_group)
+#print(df_group)
 #print(df_group['Gebietsnummer'] == 11)
 
-for key, item in df_group:
-    print(df_group.get_group(key))
+# for key, item in df_group:
+#     print(df_group.get_group(key))
 
 # Get the indices of the original dataframe to find out which party etc. it belongs to:
 #idx = df_group(['Gebietsnummer'])['Prozent'].transform(max) == df_clear['Prozent']
@@ -92,7 +101,7 @@ maximums = df_group['Prozent'].max()
 #print(df_clear.loc[df_clear.groupby(['Gebietsnummer'])['Prozent'].idxmax()].reset_index(drop=True))
 
 winners = df_clear.loc[df_clear.groupby(['Gebietsnummer'])['Prozent'].idxmax()].reset_index(drop=True)
-print(winners.to_string())
+#print(winners.to_string())
 
 
 
@@ -227,6 +236,23 @@ vote.update_mapboxes(
     zoom=4.6
 )
 
+## Bar Chart for historical data
+cov_history = px.bar(
+    covid_daily_cases_june,
+    x='time_iso8601',
+    y='daily_cases',
+    labels={'time_iso8601': 'Date', 'daily_cases': 'Daily Cases'}
+)
+cov_history.update_layout(
+        margin={"r": 0, "t": 0, "l": 0, "b": 0},
+        plot_bgcolor="#2E313B",
+        paper_bgcolor="#2E313B",
+        font={"color": "#ffffff"},
+        font_color="white"
+)
+#cov_history.show()
+
+
 
 ## Build web app with dash
 app = dash.Dash(__name__)
@@ -241,6 +267,17 @@ app.layout = lambda: html.Div(children=[
         ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'}),
         html.Div([
             dcc.Graph(figure=cov)
+        ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'}),
+        html.Div([
+            dcc.Graph(figure=vote)
+        ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'})
+    ]),
+    html.Div([
+        html.Div([
+            dcc.Graph(figure=vacc)
+        ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'}),
+        html.Div([
+            dcc.Graph(figure=cov_history)
         ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'}),
         html.Div([
             dcc.Graph(figure=vote)
