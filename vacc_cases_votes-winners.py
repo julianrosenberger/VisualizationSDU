@@ -18,6 +18,8 @@ from urllib.request import urlopen
 import json
 
 pd.options.mode.chained_assignment = None  # default='warn'
+px.set_mapbox_access_token(open("mapbox_token.txt").read())
+print(open("mapbox_token.txt").read())
 
 # get vaccination data from rki vaccination github repo:
 # (https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland)
@@ -36,7 +38,7 @@ with urlopen("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services
 covid_data = pd.json_normalize(covid_states, record_path=['features'])
 
 ## Read in Voting-Results
-with urlopen("https://raw.githubusercontent.com/julianrosenberger/VisualizationSDU/main/data/kerg2.csv?token=ARUOLO332LU5QYK5OW3OF6LBW4POK") as f:
+with urlopen("https://raw.githubusercontent.com/julianrosenberger/VisualizationSDU/main/data/kerg2.csv?token=ARUOLO6FZZDDUIENM6H2R6DBYOBVQ") as f:
     data = pd.read_csv(f, delimiter=';', skiprows=9, usecols=['Gebietsnummer', 'Gebietsname', 'UegGebietsnummer', 'Gruppenart', 'Gruppenname', 'Gruppenreihenfolge', 'Stimme',	'Prozent'])
 
 
@@ -138,7 +140,7 @@ print(winners.to_string())
 
 ## Plot Vaccination Map
 vacc = px.choropleth_mapbox(
-                    mapbox_style='white-bg',
+                    mapbox_style='dark',
                     data_frame=vacc_data,
                     geojson=germany_states,
                     locations='Bundesland',
@@ -157,11 +159,15 @@ vacc.update_mapboxes(
     zoom=4.6
 )
 vacc.update_layout(
-        margin={"r": 0, "t": 0, "l": 0, "b": 0})
+        margin={"r": 0, "t": 0, "l": 0, "b": 0},
+        plot_bgcolor="#2E313B",
+        paper_bgcolor="#2E313B",
+        font={"color": "#ffffff"}
+)
 
 ## Plot Covid-Map
 cov = px.choropleth_mapbox(
-    mapbox_style='white-bg',
+    mapbox_style='dark',
     data_frame=covid_data,
     geojson=germany_states,
     locations='attributes.LAN_ew_GEN',
@@ -175,17 +181,20 @@ cov = px.choropleth_mapbox(
     labels={'attributes.cases7_bl_per_100k': '7-day incidence', 'attributes.LAN_ew_GEN': 'State', 'attributes.death7_bl': '7-day deaths'}
 )
 cov.update_layout(
-        margin={"r": 0, "t": 0, "l": 0, "b": 0})
+        margin={"r": 0, "t": 0, "l": 0, "b": 0},
+        plot_bgcolor="#2E313B",
+        paper_bgcolor="#2E313B",
+        font={"color": "#ffffff"}
+)
 cov.update_mapboxes(
     center_lat=51.5,
     center_lon=10.25,
     zoom=4.6
 )
 
-
 ## Plot Voting-results
 vote = px.choropleth_mapbox(
-    mapbox_style='white-bg',
+    mapbox_style='dark',
     data_frame=winners,
     geojson=germany_states,
     locations='Gebietsname',
@@ -199,10 +208,17 @@ vote = px.choropleth_mapbox(
                         "CDU": "#32302e",
                         "CSU": "#32302e",
                         "AfD": "#009ee0"},
-    labels={'Gebietsname': 'State', 'Gruppenname': 'Party', 'Prozent': 'Result'}
+    labels={'Gebietsname': 'State', 'Gruppenname': 'Party', 'Prozent': 'Result'},
 )
 vote.update_layout(
-        margin={"r": 0, "t": 0, "l": 0, "b": 0})
+        margin={"r": 0, "t": 0, "l": 0, "b": 0},
+        plot_bgcolor="#2E313B",
+        paper_bgcolor="#2E313B",
+        legend={
+            "font": {"color": "black"},
+            "bgcolor": "LightSteelBlue"
+        }
+)
 vote.update_mapboxes(
     center_lat=51.5,
     center_lon=10.25,
@@ -213,31 +229,20 @@ vote.update_mapboxes(
 ## Build web app with dash
 app = dash.Dash(__name__)
 
-app.layout = lambda: html.Div([
+app.layout = lambda: html.Div(children=[
     # H1-Header
     html.H1(children="Does voting against vaccinations mean voting for COVID?",
             style={'textAlign': 'center', 'fontFamily': 'Helvetica, Arial, sans-serif'}),
     html.Div([
         html.Div([
             dcc.Graph(figure=vacc)
-        ], style={'width': '33%', 'float': 'left'}),
+        ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'}),
         html.Div([
             dcc.Graph(figure=cov)
-        ], style={'width': '33%', 'float': 'left'}),
+        ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'}),
         html.Div([
             dcc.Graph(figure=vote)
-        ], style={'width': '33%', 'float': 'left'})
-    ]),
-    html.Div([
-        html.Div([
-            dcc.Graph(figure=vacc)
-        ], style={'width': '33%', 'float': 'left'}),
-        html.Div([
-            dcc.Graph(figure=cov)
-        ], style={'width': '33%', 'float': 'left'}),
-        html.Div([
-            dcc.Graph(figure=vote)
-        ], style={'width': '33%', 'float': 'left'})
+        ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'})
     ])
 ])
 
