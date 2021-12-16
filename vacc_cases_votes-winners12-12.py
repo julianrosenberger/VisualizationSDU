@@ -202,10 +202,10 @@ vote_germ['Prozent'] = pd.to_numeric(vote_germ['Prozent'])
 
 
 # 47 different states. Diving into: SPD, CDU/CSU, AfD, and "Others":
-vote_germ.loc[vote_germ['Gruppenname'] == "CDU", 'Gruppenname'] = "CDU/CSU"
-vote_germ.loc[vote_germ['Gruppenname'] == "CSU", 'Gruppenname'] = "CDU/CSU"
+#vote_germ.loc[vote_germ['Gruppenname'] == "CDU", 'Gruppenname'] = "CDU/CSU"
+#vote_germ.loc[vote_germ['Gruppenname'] == "CSU", 'Gruppenname'] = "CDU/CSU"
 
-vote_germ.loc[vote_germ['Prozent'] <6, 'Gruppenname'] = "Other"
+vote_germ.loc[vote_germ['Prozent'] < 6, 'Gruppenname'] = "Other"
 vote_germ.loc[vote_germ['Gruppenname'] == "FDP", 'Gruppenname'] = "Other"
 vote_germ.loc[vote_germ['Gruppenname'] == "GRÜNE", 'Gruppenname'] = "Other"
 
@@ -214,7 +214,8 @@ vote_germ.loc[vote_germ['Gruppenname'] == "GRÜNE", 'Gruppenname'] = "Other"
     
 vote_chart = px.pie(vote_germ, values='Prozent', names='Gruppenname', color='Gruppenname',
                     color_discrete_map={'SPD':'#E3000F',
-                                        'CDU/CSU':'32302e',
+                                        'CDU':'32302e',
+                                        'CSU':'#0080c8',
                                         'AfD':'009ee0',
                                         'Other':'grey'})
 

@@ -26,6 +26,15 @@ url_vacc_data = "https://raw.githubusercontent.com/robert-koch-institut/COVID-19
 # read-in data from csv-file (filter out Deutschland & Bundesressorts)
 vacc_data = pd.read_csv(url_vacc_data, skiprows=[1, 18])
 
+## Read-in Vacc-History
+with urlopen("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv") as vacc_his:
+    vacc_history = pd.read_csv(vacc_his)
+
+vacc_history = vacc_history[vacc_history.location == "Germany"]
+#print(vacc_history.to_string())
+fully_vacc_germany = vacc_history[["date", "people_fully_vaccinated_per_hundred"]]
+fully_vacc_germany = fully_vacc_germany[fully_vacc_germany.date >= "2021-06-07"]
+
 # Open Germany map as GeoJSON
 with urlopen("https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/2_hoch.geo.json") as file:
     germany_states = json.load(file)
@@ -42,10 +51,9 @@ with urlopen("https://raw.githubusercontent.com/jgehrcke/covid-19-germany-gae/ma
 
 covid_history_germany = covid_history[["time_iso8601", "sum_cases"]]
 covid_history_germany.sum_cases = covid_history_germany.sum_cases.astype(int)
-covid_history_june = covid_history_germany[covid_history_germany["time_iso8601"] > "2020-06-06T17:00:00+0000"]
+covid_history_june = covid_history_germany[covid_history_germany["time_iso8601"] > "2021-06-06T17:00:00+0000"]
 covid_daily_cases_june = covid_history_june[["time_iso8601", "sum_cases"]]
-covid_daily_cases_june["daily_cases"] = covid_daily_cases_june.sum_cases.diff().fillna(526).astype(int)
-print(covid_daily_cases_june.head())
+covid_daily_cases_june["daily_cases"] = covid_daily_cases_june.sum_cases.diff().fillna(1686).astype(int)
 
 
 ## Read in Voting-Results
@@ -176,6 +184,20 @@ vacc.update_layout(
         font={"color": "#ffffff"}
 )
 
+vaccination_history = px.line(
+    fully_vacc_germany,
+    x='date',
+    y='people_fully_vaccinated_per_hundred'
+)
+vaccination_history.update_layout(
+        margin={"r": 0, "t": 0, "l": 0, "b": 0},
+        plot_bgcolor="#2E313B",
+        paper_bgcolor="#2E313B",
+        font={"color": "#ffffff"},
+        font_color="white",
+        yaxis_range=[20, 100]
+)
+
 ## Plot Covid-Map
 cov = px.choropleth_mapbox(
     mapbox_style='dark',
@@ -216,8 +238,8 @@ vote = px.choropleth_mapbox(
                 'Prozent': ':.2f%'},
     color='Gruppenname',
     color_discrete_map={'SPD': "#E3000F",
-                        "CDU": "#32302e",
-                        "CSU": "#32302e",
+                        "CDU": "#1F1E1D",
+                        "CSU": "#1F1E1D",
                         "AfD": "#009ee0"},
     labels={'Gebietsname': 'State', 'Gruppenname': 'Party', 'Prozent': 'Result'},
 )
@@ -250,7 +272,56 @@ cov_history.update_layout(
         font={"color": "#ffffff"},
         font_color="white"
 )
-#cov_history.show()
+
+# ## Plot Voting-results in form of pie chart:
+# # want for entire Germany, instead of states:
+# vote_germ = data[data.Gebietsnummer == 99]
+# vote_germ = vote_germ[vote_germ.Stimme == 1]
+# vote_germ = vote_germ[vote_germ.Gruppenart == "Partei"]
+# vote_germ = vote_germ[vote_germ.Gebietsname == "Bundesgebiet"]
+#
+# # cleaning
+# # (nan --> 0
+# vote_germ['Prozent'] = vote_germ['Prozent'].fillna(0)
+#
+# # , --> .
+# vote_germ['Prozent'] = (vote_germ['Prozent'].replace(',', '.', regex=True).astype(float))
+#
+# # string --> int
+# vote_germ['Prozent'] = pd.to_numeric(vote_germ['Prozent'])
+#
+# # print(vote_germ.to_string())
+
+
+# 47 different states. Diving into: SPD, CDU/CSU, AfD, and "Others":
+#vote_germ.loc[vote_germ['Gruppenname'] == "CDU", 'Gruppenname'] = "CDU/CSU"
+#vote_germ.loc[vote_germ['Gruppenname'] == "CSU", 'Gruppenname'] = "CDU/CSU"
+
+# vote_germ.loc[vote_germ['Prozent'] < 6, 'Gruppenname'] = "Other"
+# vote_germ.loc[vote_germ['Gruppenname'] == "FDP", 'Gruppenname'] = "Other"
+# vote_germ.loc[vote_germ['Gruppenname'] == "GRÜNE", 'Gruppenname'] = "Other"
+
+votes = {"Party": ["SPD", "CDU/CSU", "AfD", "Other"], "Result": [25.70, 24.10, 10.30, 39.90]}
+vote_germ = pd.DataFrame(votes)
+
+vote_chart = px.pie(vote_germ,
+                    values='Result',
+                    names='Party',
+                    color='Party',
+                    color_discrete_map={'SPD': '#E3000F',
+                                        'CDU/CSU': '#1F1E1D',
+                                        'AfD': '009ee0',
+                                        'Other': 'grey'}
+)
+vote_chart.update_layout(
+        #margin={"r": 0, "t": 0, "l": 0, "b": 0},
+        plot_bgcolor="#2E313B",
+        paper_bgcolor="#2E313B",
+        legend={
+            "font": {"color": "black"},
+            "bgcolor": "LightSteelBlue"
+        }
+)
 
 
 
@@ -274,13 +345,13 @@ app.layout = lambda: html.Div(children=[
     ]),
     html.Div([
         html.Div([
-            dcc.Graph(figure=vacc)
+            dcc.Graph(figure=vaccination_history)
         ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'}),
         html.Div([
             dcc.Graph(figure=cov_history)
         ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'}),
         html.Div([
-            dcc.Graph(figure=vote)
+            dcc.Graph(figure=vote_chart)
         ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'})
     ])
 ])
