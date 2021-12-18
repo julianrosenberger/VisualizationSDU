@@ -159,7 +159,7 @@ winners = df_clear.loc[df_clear.groupby(['Gebietsnummer'])['Prozent'].idxmax()].
 
 ## Plot Vaccination Map
 vacc = px.choropleth_mapbox(
-                    mapbox_style='dark',
+                    mapbox_style='light',
                     data_frame=vacc_data,
                     geojson=germany_states,
                     locations='Bundesland',
@@ -179,9 +179,9 @@ vacc.update_mapboxes(
 )
 vacc.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
-        plot_bgcolor="#2E313B",
-        paper_bgcolor="#2E313B",
-        font={"color": "#ffffff"}
+        plot_bgcolor="#fff",
+        paper_bgcolor="#fff",
+        font={"color": "#000"}
 )
 
 vaccination_history = px.line(
@@ -191,16 +191,16 @@ vaccination_history = px.line(
 )
 vaccination_history.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
-        plot_bgcolor="#2E313B",
-        paper_bgcolor="#2E313B",
-        font={"color": "#ffffff"},
-        font_color="white",
+        plot_bgcolor="#fff",
+        paper_bgcolor="#fff",
+        font={"color": "black"},
+        font_color="black",
         yaxis_range=[20, 100]
 )
 
 ## Plot Covid-Map
 cov = px.choropleth_mapbox(
-    mapbox_style='dark',
+    mapbox_style='light',
     data_frame=covid_data,
     geojson=germany_states,
     locations='attributes.LAN_ew_GEN',
@@ -211,13 +211,14 @@ cov = px.choropleth_mapbox(
                 'attributes.death7_bl': True},
     color='attributes.cases7_bl_per_100k',
     color_continuous_scale=px.colors.sequential.YlOrRd,
-    labels={'attributes.cases7_bl_per_100k': '7-day incidence', 'attributes.LAN_ew_GEN': 'State', 'attributes.death7_bl': '7-day deaths'}
+    labels={'attributes.cases7_bl_per_100k': '7-day incidence', 'attributes.LAN_ew_GEN': 'State', 'attributes.death7_bl': '7-day deaths'},
+    title="7-day incidence Germany"
 )
 cov.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
-        plot_bgcolor="#2E313B",
-        paper_bgcolor="#2E313B",
-        font={"color": "#ffffff"}
+        plot_bgcolor="#fff",
+        paper_bgcolor="#fff",
+        font={"color": "#000"}
 )
 cov.update_mapboxes(
     center_lat=51.5,
@@ -245,8 +246,8 @@ vote = px.choropleth_mapbox(
 )
 vote.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
-        plot_bgcolor="#2E313B",
-        paper_bgcolor="#2E313B",
+        plot_bgcolor="#fff",
+        paper_bgcolor="#fff",
         legend={
             "font": {"color": "black"},
             "bgcolor": "LightSteelBlue"
@@ -267,10 +268,10 @@ cov_history = px.bar(
 )
 cov_history.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
-        plot_bgcolor="#2E313B",
-        paper_bgcolor="#2E313B",
-        font={"color": "#ffffff"},
-        font_color="white"
+        plot_bgcolor="#fff",
+        paper_bgcolor="#fff",
+        font={"color": "black"},
+        font_color="black"
 )
 
 # ## Plot Voting-results in form of pie chart:
@@ -315,8 +316,8 @@ vote_chart = px.pie(vote_germ,
 )
 vote_chart.update_layout(
         #margin={"r": 0, "t": 0, "l": 0, "b": 0},
-        plot_bgcolor="#2E313B",
-        paper_bgcolor="#2E313B",
+        plot_bgcolor="#fff",
+        paper_bgcolor="#fff",
         legend={
             "font": {"color": "black"},
             "bgcolor": "LightSteelBlue"
@@ -330,30 +331,33 @@ app = dash.Dash(__name__)
 
 app.layout = lambda: html.Div(children=[
     # H1-Header
+    html.Div([
+        html.Img(src="https://www.sdu.dk/-/media/files/nyheder/logoer/sdu_black_rgb_png.png")], className='img-container'),
     html.H1(children="Does voting against vaccinations mean voting for COVID?",
             style={'textAlign': 'center', 'fontFamily': 'Helvetica, Arial, sans-serif'}),
+    html.H3(children="By Julian Rosenberger and Sarah Stougaard"),
     html.Div([
         html.Div([
             dcc.Graph(figure=vacc)
-        ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'}),
+        ]),
         html.Div([
             dcc.Graph(figure=cov)
-        ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'}),
+        ]),
         html.Div([
             dcc.Graph(figure=vote)
-        ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'})
-    ]),
+        ])
+    ], className='container'),
     html.Div([
         html.Div([
             dcc.Graph(figure=vaccination_history)
-        ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'}),
+        ]),
         html.Div([
             dcc.Graph(figure=cov_history)
-        ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'}),
+        ]),
         html.Div([
             dcc.Graph(figure=vote_chart)
-        ], style={'width': '33%', 'float': 'left', 'background-color': '#2E313B'})
-    ])
+        ]),
+    ], className='container'),
 ])
 
 
