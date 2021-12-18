@@ -112,51 +112,6 @@ winners = df_clear.loc[df_clear.groupby(['Gebietsnummer'])['Prozent'].idxmax()].
 #print(winners.to_string())
 
 
-
-
-
-
-
-
-
-
-#parties = ["SPD", "GRÜNE", "CDU", "AfD"]
-
-#voting_results = pd.DataFrame(columns=['StateID', 'State', 'Party', 'Result'])
-#winners = pd.DataFrame(columns=['State', 'Party', 'Result'])
-
-
-
-
-#for i in range(len(data)):
-#    for state_id in range(1, 17):
-#        for party in parties:
-#            if state_id == 9:
-#                parties[2] = "CSU"
-#            else:
-#                parties[2] = "CDU"
-#
-#            if data.loc[i, 'Gebietsnummer'] == state_id and data.loc[i, 'Gruppenname'] == party and data.loc[i, 'Stimme'] == 1:
-#                voting_results = voting_results.append({'StateID': data.loc[i, 'Gebietsnummer'],
-#                                                        'State': data.loc[i, 'Gebietsname'],
-#                                                        'Party': data.loc[i, 'Gruppenname'],
-#                                                        'Result': data.loc[i, 'Prozent']},
-#                                                       ignore_index=True)
-#
-#                winners = pandasql.sqldf("SELECT State, Party, MAX(Result) FROM voting_results GROUP BY StateID")
-
-# for j in range(len(voting_results)):
-#     for state_id in range (1, 17):
-#         # max_value = voting_results[j, 'Result']
-#         if voting_results[j, 'Gebietsnummer'] == voting_results[j + 1, 'Gebietsnummer']:
-#
-#
-#         if voting_results[j, 'Result'] > max_value:
-#             max_value = voting_results[j, 'Result']
-#
-#         winners = winners.append({'State': , 'Party': , 'Result': }, ignore_index=True)
-
-
 ## Plot Vaccination Map
 vacc = px.choropleth_mapbox(
                     mapbox_style='light',
@@ -175,7 +130,7 @@ vacc = px.choropleth_mapbox(
 vacc.update_mapboxes(
     center_lat=51.5,
     center_lon=10.25,
-    zoom=4.6
+    zoom=4.55
 )
 vacc.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
@@ -187,15 +142,13 @@ vacc.update_layout(
 vaccination_history = px.line(
     fully_vacc_germany,
     x='date',
-    y='people_fully_vaccinated_per_hundred'
+    y='people_fully_vaccinated_per_hundred',
+    labels={"people_fully_vaccinated_per_hundred": "Proportion of vaccinated", "date": "Date"}
 )
 vaccination_history.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
-        plot_bgcolor="#fff",
-        paper_bgcolor="#fff",
-        font={"color": "black"},
-        font_color="black",
-        yaxis_range=[20, 100]
+        yaxis_range=[20, 100],
+        yaxis_showgrid=True,
 )
 
 ## Plot Covid-Map
@@ -211,8 +164,7 @@ cov = px.choropleth_mapbox(
                 'attributes.death7_bl': True},
     color='attributes.cases7_bl_per_100k',
     color_continuous_scale=px.colors.sequential.YlOrRd,
-    labels={'attributes.cases7_bl_per_100k': '7-day incidence', 'attributes.LAN_ew_GEN': 'State', 'attributes.death7_bl': '7-day deaths'},
-    title="7-day incidence Germany"
+    labels={'attributes.cases7_bl_per_100k': '7-day incidence', 'attributes.LAN_ew_GEN': 'State', 'attributes.death7_bl': '7-day deaths'}
 )
 cov.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
@@ -223,12 +175,12 @@ cov.update_layout(
 cov.update_mapboxes(
     center_lat=51.5,
     center_lon=10.25,
-    zoom=4.6
+    zoom=4.55
 )
 
 ## Plot Voting-results
 vote = px.choropleth_mapbox(
-    mapbox_style='dark',
+    mapbox_style='light',
     data_frame=winners,
     geojson=germany_states,
     locations='Gebietsname',
@@ -239,24 +191,18 @@ vote = px.choropleth_mapbox(
                 'Prozent': ':.2f%'},
     color='Gruppenname',
     color_discrete_map={'SPD': "#E3000F",
-                        "CDU": "#1F1E1D",
-                        "CSU": "#1F1E1D",
+                        "CDU": "#000",
+                        "CSU": "#000",
                         "AfD": "#009ee0"},
     labels={'Gebietsname': 'State', 'Gruppenname': 'Party', 'Prozent': 'Result'},
 )
 vote.update_layout(
-        margin={"r": 0, "t": 0, "l": 0, "b": 0},
-        plot_bgcolor="#fff",
-        paper_bgcolor="#fff",
-        legend={
-            "font": {"color": "black"},
-            "bgcolor": "LightSteelBlue"
-        }
+        margin={"r": 0, "t": 0, "l": 0, "b": 0}
 )
 vote.update_mapboxes(
     center_lat=51.5,
     center_lon=10.25,
-    zoom=4.6
+    zoom=4.55
 )
 
 ## Bar Chart for historical data
@@ -267,40 +213,8 @@ cov_history = px.bar(
     labels={'time_iso8601': 'Date', 'daily_cases': 'Daily Cases'}
 )
 cov_history.update_layout(
-        margin={"r": 0, "t": 0, "l": 0, "b": 0},
-        plot_bgcolor="#fff",
-        paper_bgcolor="#fff",
-        font={"color": "black"},
-        font_color="black"
+        margin={"r": 0, "t": 0, "l": 0, "b": 0}
 )
-
-# ## Plot Voting-results in form of pie chart:
-# # want for entire Germany, instead of states:
-# vote_germ = data[data.Gebietsnummer == 99]
-# vote_germ = vote_germ[vote_germ.Stimme == 1]
-# vote_germ = vote_germ[vote_germ.Gruppenart == "Partei"]
-# vote_germ = vote_germ[vote_germ.Gebietsname == "Bundesgebiet"]
-#
-# # cleaning
-# # (nan --> 0
-# vote_germ['Prozent'] = vote_germ['Prozent'].fillna(0)
-#
-# # , --> .
-# vote_germ['Prozent'] = (vote_germ['Prozent'].replace(',', '.', regex=True).astype(float))
-#
-# # string --> int
-# vote_germ['Prozent'] = pd.to_numeric(vote_germ['Prozent'])
-#
-# # print(vote_germ.to_string())
-
-
-# 47 different states. Diving into: SPD, CDU/CSU, AfD, and "Others":
-#vote_germ.loc[vote_germ['Gruppenname'] == "CDU", 'Gruppenname'] = "CDU/CSU"
-#vote_germ.loc[vote_germ['Gruppenname'] == "CSU", 'Gruppenname'] = "CDU/CSU"
-
-# vote_germ.loc[vote_germ['Prozent'] < 6, 'Gruppenname'] = "Other"
-# vote_germ.loc[vote_germ['Gruppenname'] == "FDP", 'Gruppenname'] = "Other"
-# vote_germ.loc[vote_germ['Gruppenname'] == "GRÜNE", 'Gruppenname'] = "Other"
 
 votes = {"Party": ["SPD", "CDU/CSU", "AfD", "Other"], "Result": [25.70, 24.10, 10.30, 39.90]}
 vote_germ = pd.DataFrame(votes)
@@ -310,18 +224,12 @@ vote_chart = px.pie(vote_germ,
                     names='Party',
                     color='Party',
                     color_discrete_map={'SPD': '#E3000F',
-                                        'CDU/CSU': '#1F1E1D',
+                                        'CDU/CSU': '#000',
                                         'AfD': '009ee0',
-                                        'Other': 'grey'}
+                                        'Other': '#ccc'}
 )
 vote_chart.update_layout(
-        #margin={"r": 0, "t": 0, "l": 0, "b": 0},
-        plot_bgcolor="#fff",
-        paper_bgcolor="#fff",
-        legend={
-            "font": {"color": "black"},
-            "bgcolor": "LightSteelBlue"
-        }
+        margin={"r": 10, "t": 10, "l": 10, "b": 10}
 )
 
 
@@ -335,26 +243,38 @@ app.layout = lambda: html.Div(children=[
         html.Img(src="https://www.sdu.dk/-/media/files/nyheder/logoer/sdu_black_rgb_png.png")], className='img-container'),
     html.H1(children="Does voting against vaccinations mean voting for COVID?",
             style={'textAlign': 'center', 'fontFamily': 'Helvetica, Arial, sans-serif'}),
-    html.H3(children="By Julian Rosenberger and Sarah Stougaard"),
+    html.H3(children="By Julian Rosenberger and Sarah Stougaard", className="authors"),
     html.Div([
         html.Div([
+            html.H3("Fully Vaccinated People in Germany"),
+            html.Hr(className="solid"),
             dcc.Graph(figure=vacc)
         ]),
         html.Div([
+            html.H3("7-day Incidence Germany"),
+            html.Hr(className="solid"),
             dcc.Graph(figure=cov)
         ]),
         html.Div([
+            html.H3("Voting Results Germany 2021"),
+            html.Hr(className="solid"),
             dcc.Graph(figure=vote)
         ])
     ], className='container'),
     html.Div([
         html.Div([
+            html.H3("Proportion of Fully Vaccinated Germans"),
+            html.Hr(className="solid"),
             dcc.Graph(figure=vaccination_history)
         ]),
         html.Div([
+            html.H3("Daily Cases Germany",className="dailycases"),
+            html.Hr(className="solid"),
             dcc.Graph(figure=cov_history)
         ]),
         html.Div([
+            html.H3("Voting Results Germany 2021"),
+            html.Hr(className="solid"),
             dcc.Graph(figure=vote_chart)
         ]),
     ], className='container'),
