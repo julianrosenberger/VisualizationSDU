@@ -18,8 +18,8 @@ from urllib.request import urlopen
 import json
 
 pd.options.mode.chained_assignment = None  # default='warn'
-px.set_mapbox_access_token(open("mapbox_token.txt").read())
-print(open("mapbox_token.txt").read())
+px.set_mapbox_access_token(open("../mapbox_token.txt").read())
+print(open("../mapbox_token.txt").read())
 
 # get vaccination data from rki vaccination github repo:
 # (https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland)
