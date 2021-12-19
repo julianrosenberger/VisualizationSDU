@@ -26,7 +26,7 @@ hr.solid {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: darkslateblue;
+    background: forestgreen;
     box-shadow: 3px 2px 5px #999;
     position: fixed;
     bottom: 15px;
@@ -109,7 +109,7 @@ hr.solid {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: darkslateblue;
+    background: forestgreen;
     box-shadow: 3px 2px 5px #999;
     position: fixed;
     bottom: 15px;

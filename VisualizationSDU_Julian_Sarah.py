@@ -115,6 +115,9 @@ vaccination_history = px.line(
     fully_vacc_germany,
     x='date',
     y='people_fully_vaccinated_per_hundred',
+    hover_data={
+        'people_fully_vaccinated_per_hundred': ':.1f'
+    },
     labels={"people_fully_vaccinated_per_hundred": "Proportion of vaccinated", "date": "Date"}
 )
 vaccination_history.update_layout(
@@ -133,8 +136,8 @@ cov = px.choropleth_mapbox(
     featureidkey='properties.name',
     hover_name='attributes.LAN_ew_GEN',
     hover_data={'attributes.LAN_ew_GEN': False,
-                'attributes.cases7_bl_per_100k': ':.1f+%',
-                'attributes.death7_bl': True},
+                'attributes.cases7_bl_per_100k': ':.1f',
+                'attributes.death7_bl': False},
     color='attributes.cases7_bl_per_100k',
     color_continuous_scale=px.colors.sequential.YlOrRd,
     labels={'attributes.cases7_bl_per_100k': '7-day incidence', 'attributes.LAN_ew_GEN': 'State',
@@ -153,6 +156,9 @@ cov_history = px.bar(
     covid_daily_cases_june,
     x='time_iso8601',
     y='daily_cases',
+    hover_data={
+        'daily_cases': ':.0f'
+    },
     labels={'time_iso8601': 'Date', 'daily_cases': 'Daily Cases'}
 )
 cov_history.update_layout(
@@ -170,13 +176,13 @@ vote = px.choropleth_mapbox(
     hover_name='Gebietsname',
     hover_data={'Gebietsname': False,
                 'Gruppenname': True,
-                'Prozent': ':.1f+%'},
+                'Prozent': ':.1f'},
     color='Gruppenname',
     color_discrete_map={'SPD': "#E3000F",
                         "CDU": "#000",
                         "CSU": "#000",
                         "AfD": "#009ee0"},
-    labels={'Gebietsname': 'State', 'Gruppenname': 'Party', 'Prozent': 'Result'},
+    labels={'Gebietsname': 'State', 'Gruppenname': 'Winner', 'Prozent': 'Result'},
 )
 vote.update_layout(
     margin={"r": 0, "t": 0, "l": 0, "b": 0}
@@ -195,11 +201,11 @@ vote_chart = px.pie(vote_germ,
                     color_discrete_map={'SPD': '#E3000F',
                                         'CDU/CSU': '#000',
                                         'AfD': '009ee0',
-                                        'Other': '#ccc'},
-                    labels={"Party": "Winner"}
+                                        'Other': '#ccc'}
                     )
 vote_chart.update_layout(
-    margin={"r": 10, "t": 10, "l": 10, "b": 10}
+    margin={"r": 10, "t": 10, "l": 10, "b": 10},
+    showlegend=True,
 )
 
 ### Build web app with dash ###
@@ -215,24 +221,24 @@ app.layout = html.Div(children=[
     html.H3(children="By Julian Rosenberger and Sarah Stougaard", className="authors"),
     html.Div([
         html.Div([
-            html.H3("Fully Vaccinated People in Germany"),
+            html.H3("Fully Vaccinated People in Germany (%)"),
             html.Hr(className="solid"),
             dcc.Graph(figure=vacc)
         ]),
         html.Div([
-            html.H3("7-day Incidence Germany"),
+            html.H3("7-day Incidence Germany (per 100k)"),
             html.Hr(className="solid"),
             dcc.Graph(figure=cov)
         ]),
         html.Div([
-            html.H3("Voting Results Germany 2021"),
+            html.H3("Voting Results Germany 2021 (%)"),
             html.Hr(className="solid"),
             dcc.Graph(figure=vote)
         ])
     ], className='container'),
     html.Div([
         html.Div([
-            html.H3("Proportion of Fully Vaccinated Germans"),
+            html.H3("Proportion of Fully Vaccinated Germans (%)"),
             html.Hr(className="solid"),
             dcc.Graph(figure=vaccination_history)
         ]),
