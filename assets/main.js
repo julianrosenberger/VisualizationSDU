@@ -8,21 +8,21 @@ let overlayContent = `
          </svg>
       </div>
         <div style="font-weight: bold">
-        The purpose of this page is to compare data on covid-19 infections, vaccination rates, and 2021 voting results in Germany (by state).<br><br></div>
+        The purpose of this page is to compare data on Covid19 infections, vaccination rates, and 2021 voting results in Germany (by state).<br><br></div>
         
-        <div>The charts for infections and vaccination coverage starts in June 2021, since this is when vaccinations became available for all in Germany.
+        <div>The charts for infections and vaccination coverage starts in June 2021, since this is the date at which vaccinations became available for everyone in Germany.
         Data on vaccination and infections are updated daily.<br><br>
         </div>
         <div style="font-weight: bold">What can you do?</div>
         <ul>
         <li><b>Zooming on the maps:</b> when you hold your mouse on the map, you’re able to zoom in/out by scrolling.</li>
-        <li><b>Look-up:</b> By hovering over the data (charts or maps) you can see the exact data for the given state/party/time point.</li>
+        <li><b>Look-up:</b> By hovering over the data (charts or maps) you can see the exact data for the given state or party as well as point in time.</li>
         </ul>
         <div><b>Sources</b></div>
         <ul>
-            <li>Vaccination data: The Robert Koch Institute (RKI)</li>
-            <li>Covid-19 infection data: The Robert Koch Institute (RKI)</li>
-            <li>Voting data: Der Bundeswahlleiter</li>
+            <li>Vaccination data: <a href="https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html">The Robert Koch Institut (RKI)</a></li>
+            <li>Covid-19 infection data: <a href="https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquoten-Tab.html">The Robert Koch Institut (RKI)</a></li>
+            <li>Voting data: <a href="https://www.bundeswahlleiter.de/">Bundeswahlleiter</a></li>
         </ul>
    </div>`;
 let overlay = document.createElement('div');

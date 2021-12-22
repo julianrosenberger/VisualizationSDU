@@ -57,8 +57,8 @@ with urlopen(
 # Clean-up Voting-results
 # Deleting where Gruppenart!=Partei
 df_clear = data[data.Gruppenart == "Partei"]
-# deleting Stimme==2:
-df_clear2 = df_clear[df_clear.Stimme == 1]
+# deleting Stimme==1:
+df_clear2 = df_clear[df_clear.Stimme == 2]
 # Grouped dataframe with only the states 1-16 (both incl.)
 df_clear3 = df_clear2[df_clear2.Gebietsnummer < 17]
 # Make sure Gebietsnummer belongs to state
