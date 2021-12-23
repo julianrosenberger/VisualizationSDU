@@ -20,8 +20,8 @@ let overlayContent = `
         </ul>
         <div><b>Sources</b></div>
         <ul>
-            <li>Vaccinations: <a href="https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html">The Robert Koch Institut (RKI)</a></li>
-            <li>Infections: <a href="https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquoten-Tab.html">The Robert Koch Institut (RKI)</a></li>
+            <li>Vaccinations: <a href="https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html">Robert Koch-Institut (RKI)</a></li>
+            <li>Infections: <a href="https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquoten-Tab.html">Robert Koch-Institut (RKI)</a></li>
             <li>Voting results: <a href="https://www.bundeswahlleiter.de/">Bundeswahlleiter</a></li>
         </ul>
    </div>`;

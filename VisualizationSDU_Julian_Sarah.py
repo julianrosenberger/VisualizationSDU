@@ -19,8 +19,7 @@ url_vacc_data = "https://raw.githubusercontent.com/robert-koch-institut/COVID-19
 vacc_data = pd.read_csv(url_vacc_data, skiprows=[1, 18])
 
 ## Read-in Vacc-History
-with urlopen(
-        "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv") as vacc_his:
+with urlopen("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv") as vacc_his:
     vacc_history = pd.read_csv(vacc_his)
 
 # Clean-up Vacc-History
@@ -48,8 +47,7 @@ covid_daily_cases_june = covid_history_june[["time_iso8601", "sum_cases"]]
 covid_daily_cases_june["daily_cases"] = covid_daily_cases_june.sum_cases.diff().fillna(1686).astype(int)
 
 ## Read in Voting-Results
-with urlopen(
-        "https://raw.githubusercontent.com/julianrosenberger/VisualizationSDU/main/data/kerg2.csv?token=ARUOLO6FZZDDUIENM6H2R6DBYOBVQ") as f:
+with urlopen("https://raw.githubusercontent.com/julianrosenberger/VisualizationSDU/main/data/kerg2.csv?token=ARUOLO4UXYPQGNQROTOGVL3BZVLQI") as f:
     data = pd.read_csv(f, delimiter=';', skiprows=9,
                        usecols=['Gebietsnummer', 'Gebietsname', 'UegGebietsnummer', 'Gruppenart', 'Gruppenname',
                                 'Gruppenreihenfolge', 'Stimme', 'Prozent'])
